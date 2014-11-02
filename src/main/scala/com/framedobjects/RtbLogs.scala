@@ -21,7 +21,7 @@ object RtbLogs {
   val endDate = dateFormat.parse("2014-10-29 21:10:00,000")
 
   def main(args: Array[String]) {
-    val sparkConfig = new SparkConf().setAppName("Test").setMaster("local")
+    val sparkConfig = new SparkConf().setAppName("Test").setMaster("local").setAppName("RTB Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
 
     val bidResponsesByIidRDD: RDD[CountByIid] = getRtbResponseRDDKeyedByImpressionId(sparkContext)
@@ -39,6 +39,7 @@ object RtbLogs {
     
     println(s"bid responses: ${bidResponsesByIidRDD.count}\nintersection: ${intersectionRDD.count}\ndeltaRDD: ${deltaRDD.count}")
     
+    sparkContext.stop
   }
   
   def filterForNone(all: (Long, (String, Option[String]))): Boolean = {
