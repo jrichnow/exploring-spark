@@ -2,11 +2,11 @@ package com.framedobjects
 
 import java.text.SimpleDateFormat
 import java.util.Date
-
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext.rddToPairRDDFunctions
 import org.apache.spark.rdd.RDD
+import org.apache.spark.storage.StorageLevel
 
 
 object RtbLogs {
@@ -36,6 +36,7 @@ object RtbLogs {
     
     val deltaRDD = bidResponsesByIidRDD.subtractByKey(intersectionRDD)
     deltaRDD.foreach(println)
+    deltaRDD.persist(StorageLevel.MEMORY_AND_DISK)
     
     println(s"bid responses: ${bidResponsesByIidRDD.count}\nintersection: ${intersectionRDD.count}\ndeltaRDD: ${deltaRDD.count}")
     
