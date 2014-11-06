@@ -2,11 +2,11 @@ package com.framedobjects
 
 import java.text.SimpleDateFormat
 import java.util.Date
+
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext.rddToPairRDDFunctions
 import org.apache.spark.rdd.RDD
-import org.apache.spark.storage.StorageLevel
 
 
 object RtbLogs {
@@ -19,13 +19,22 @@ object RtbLogs {
 
   val startDate = dateFormat.parse("2014-10-29 20:00:00,000")
   val endDate = dateFormat.parse("2014-10-29 21:10:00,000")
+  
+  val advertIds = List("137519", "137520", "137521")
+  
+  val advertIdsAsJsonList = advertIds.map(x => "\"aid\":" + x + ",\"")
 
   def main(args: Array[String]) {
     val sparkConfig = new SparkConf().setAppName("Test").setMaster("local").setAppName("RTB Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
-
+    
+    println("fetching bid responses ...")
     val bidResponsesByIidRDD: RDD[CountByIid] = getRtbResponseRDDKeyedByImpressionId(sparkContext)
+
+    println("fetching notifications ...")
     val notificationsByIidRDD = getRtbNotificationsRDDKeyedByImpressionId(sparkContext)
+    
+    println("intersecting ...")
     val intersectionRDD = bidResponsesByIidRDD.intersection(notificationsByIidRDD);
 //    val unfilteredResult = bidResponsesByIidRDD.leftOuterJoin(intersectionRDD)
 //    val filteredResult = unfilteredResult.filter(filterForNone)
@@ -34,10 +43,13 @@ object RtbLogs {
     
 //    println(s"bid responses: ${bidResponsesByIidRDD.count}\nintersection: ${intersectionRDD.count}\nunfilteredResult: ${unfilteredResult.count}\nfilteredResult: ${filteredResult.count}")
     
+    println("subtracting ...")
     val deltaRDD = bidResponsesByIidRDD.subtractByKey(intersectionRDD)
-    deltaRDD.foreach(println)
-    deltaRDD.persist(StorageLevel.MEMORY_AND_DISK)
     
+    println("bids without notifications:")
+    deltaRDD.foreach(println)
+    
+    println("numbers:")
     println(s"bid responses: ${bidResponsesByIidRDD.count}\nintersection: ${intersectionRDD.count}\ndeltaRDD: ${deltaRDD.count}")
     
     sparkContext.stop
@@ -67,12 +79,19 @@ object RtbLogs {
     val logTime = dateFormat.parse(lineSplit(0))
     if (logTime.after(startDate) && logTime.before(endDate)) {
       line match {
-        case s if (s.contains("\"aid\":137519,") || s.contains("\"aid\":137520,") || s.contains("\"aid\":137521,")) => true
+        case s if (containsAdvertId(s)) => true
         case _ => false
       }
     } else false
   }
-
+  
+  def containsAdvertId(line: String): Boolean = {
+    for (x <- advertIdsAsJsonList) {
+      if (line.contains(x)) return true
+    }
+    false
+  }
+  
   def notificationFilter(line: String, startDate: Date, endDate: Date): Boolean = {
     val lineSplit = line.split("\\|")
     val logTime = dateFormat.parse(lineSplit(0))
