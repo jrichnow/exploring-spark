@@ -2,11 +2,11 @@ package com.framedobjects
 
 import java.text.SimpleDateFormat
 import java.util.Date
-
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext.rddToPairRDDFunctions
 import org.apache.spark.rdd.RDD
+import scala.collection.immutable.Map
 
 
 object RtbLogs {
@@ -20,9 +20,15 @@ object RtbLogs {
   val startDate = dateFormat.parse("2014-10-29 20:00:00,000")
   val endDate = dateFormat.parse("2014-10-29 21:10:00,000")
   
-  val advertIds = List("137519", "137520", "137521")
+//  val campaignMap = Map("38395" -> List("111875", "111876"))
+  val campaignMap = Map("47247" -> List("137519", "137520", "137521"))
+//  val advertIds = List("137519", "137520", "137521")
+//  val advertIds = List("111875", "111876")
+//  val advertIds = List("99510", "99518", "99519", "99520", "99521")
   
-  val advertIdsAsJsonList = advertIds.map(x => "\"aid\":" + x + ",\"")
+  val advertIdsAsJsonList = campaignMap.get("47247").get.map(x => "\"aid\":" + x + ",\"")
+//  val advertIdsAsJsonList = campaignMap.mapValues(x => x.map(a => "\"aid\":" + a + ",\""))
+  advertIdsAsJsonList.foreach(println)
 
   def main(args: Array[String]) {
     val sparkConfig = new SparkConf().setAppName("Test").setMaster("local").setAppName("RTB Log Files Investigation")
