@@ -9,6 +9,9 @@ import java.util.Date
 import org.apache.spark.storage.StorageLevel
 import java.lang.Double
 import java.text.DecimalFormat
+import java.io.FileWriter
+import java.io.File
+import java.io.PrintWriter
 
 object RtbLogFileAnalyser {
 
@@ -16,17 +19,17 @@ object RtbLogFileAnalyser {
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss,SSS")
 
-//  val startDate = dateFormat.parse("2014-10-29 20:00:00,000")
-//  val endDate = dateFormat.parse("2014-10-29 21:10:00,000")
-  
-//  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/opt_responses-*.log"
-//  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/opt_notif-*.log"
+  //  val startDate = dateFormat.parse("2014-10-29 20:00:00,000")
+  //  val endDate = dateFormat.parse("2014-10-29 21:10:00,000")
+  //  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/opt_responses-*.log"
+  //  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/opt_notif-*.log"
 
-  val startDate = dateFormat.parse("2014-11-06 00:00:00,000")
-  val endDate = dateFormat.parse("2014-11-06 04:40:00,000")
-  
-  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/06112014/opt_responses-*.log"
-  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/06112014/opt_notif-*.log"
+  val startDate = dateFormat.parse("2014-11-05 22:00:00,000")
+  val endDate = dateFormat.parse("2014-11-05 23:00:00,000")
+  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/05112014/opt_responses-433--2014-11-05--*.log"
+  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/05112014/opt_notif-433--2014-11-05--2.log"
+
+  val resultFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/05112014/result_22-23.txt"
 
   val campaignAdvertMap = Map("47247" -> List("137519", "137520", "137521"),
     "38395" -> List("111875", "111876"),
@@ -35,7 +38,10 @@ object RtbLogFileAnalyser {
     "34497" -> List("99512", "99527", "99529", "99526", "99528"),
     "35433" -> List("102794", "102796", "102797", "102798", "102799", "112085"),
     "38575" -> List("112444", "112445"),
+    "46172" -> List("134836", "134835", "134834"),
     "46271" -> List("135050", "135049", "135048"),
+    "46591" -> List("135881", "135880", "135879"),
+    "44587" -> List("137796", "132149", "131316", "131317", "129859", "130212"),
     "44863" -> List("137794", "137140", "130885", "131806", "130882"),
     "22108" -> List("60456", "62510", "81217", "60457", "60458", "81216", "81215", "99545", "99547"))
 
@@ -53,12 +59,22 @@ object RtbLogFileAnalyser {
     val notificationsByIidRDD = getRtbNotificationsRDDKeyedByImpressionId(sparkContext)
     notificationsByIidRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
-    for (key <- jsonfiedCampaignAdvertMap.keySet) {
-      val (r, n, d, iids) = process(key, responsesFileRDD, notificationsByIidRDD)
+    val writer = new PrintWriter(new File(resultFile))
+    writer.write("cid\tresp\tnotif\tdelta\tperc\tiids\n")
 
-      val p = BigDecimal(percentage(r, n)).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-      println(s"cid: $key,\tresponses: $r\tnotifications: $n\tdelta: $d\tperc: $p\t$iids")
+    for (key <- jsonfiedCampaignAdvertMap.keySet) {
+      val (responses, notifications, delta, iids) = process(key, responsesFileRDD, notificationsByIidRDD)
+      val perc = calculatePercentage(responses, notifications)
+      val percEval: Double = perc match {
+        case a if a.isNaN() => 0
+        case x => x
+      }
+      println(s"campaign: $key - perc: $perc, percEval: $percEval")
+      val percentage = BigDecimal(percEval).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+      writer.write(s"$key\t$responses\t$notifications\t$delta\t$percentage\t$iids\n")
     }
+
+    writer.close
 
     sparkContext.stop
   }
@@ -71,7 +87,7 @@ object RtbLogFileAnalyser {
     (bidResponsesByIidRDD.count, intersectionRDD.count, deltaRDD.count, deltaRDD.keys.toArray.mkString(","))
   }
 
-  def percentage(a: Long, b: Long): Double = {
+  def calculatePercentage(a: Long, b: Long): Double = {
     (100 * (a - b)) / a.toDouble
   }
 
