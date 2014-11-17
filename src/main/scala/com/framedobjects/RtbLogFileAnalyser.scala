@@ -24,12 +24,12 @@ object RtbLogFileAnalyser {
   //  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/opt_responses-*.log"
   //  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/opt_notif-*.log"
 
-  val startDate = dateFormat.parse("2014-11-05 22:00:00,000")
-  val endDate = dateFormat.parse("2014-11-05 23:00:00,000")
-  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/05112014/opt_responses-433--2014-11-05--*.log"
-  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/05112014/opt_notif-433--2014-11-05--2.log"
+  val startDate = dateFormat.parse("2014-11-12 23:00:00,000")
+  val endDate = dateFormat.parse("2014-11-12 23:59:59,000")
+  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/12112014/opt_responses-433--2014-11-12--*.log"
+  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/12112014/opt_notif-433--2014-11-12--*.log"
 
-  val resultFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/05112014/result_22-23.txt"
+  val resultFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/12112014/result_23-24.txt"
 
   val campaignAdvertMap = Map("47247" -> List("137519", "137520", "137521"),
     "38395" -> List("111875", "111876"),
