@@ -19,17 +19,14 @@ object RtbLogFileAnalyser {
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss,SSS")
 
-  //  val startDate = dateFormat.parse("2014-10-29 20:00:00,000")
-  //  val endDate = dateFormat.parse("2014-10-29 21:10:00,000")
-  //  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/opt_responses-*.log"
-  //  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/opt_notif-*.log"
+  val startDate = dateFormat.parse("2014-11-19 08:00:00,000")
+  val endDate = dateFormat.parse("2014-11-19 09:00:00,000")
+//  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/19112014/opt_responses.log"
+//  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/19112014/opt_notif.log"
+  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/19112014/opt_responses-433--2014-11-19--*.log.gz"
+  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/19112014/opt_notif-433--2014-11-19--*.log.gz"
 
-  val startDate = dateFormat.parse("2014-11-12 23:00:00,000")
-  val endDate = dateFormat.parse("2014-11-12 23:59:59,000")
-  val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/12112014/opt_responses-433--2014-11-12--*.log"
-  val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/12112014/opt_notif-433--2014-11-12--*.log"
-
-  val resultFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/12112014/result_23-24.txt"
+  val resultFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/19112014/_result_08-09.txt"
 
   val campaignAdvertMap = Map("47247" -> List("137519", "137520", "137521"),
     "38395" -> List("111875", "111876"),
@@ -80,7 +77,7 @@ object RtbLogFileAnalyser {
   }
 
   def process(campaignId: String, responsesRDD: RDD[String], notificationRDD: RDD[(Long, String)]): (Long, Long, Long, String) = {
-    val bidResponsesByIidRDD: RDD[CountByIid] = getRtbResponseRDDKeyedByImpressionId(responsesRDD, campaignAdvertMap.get(campaignId).get)
+    val bidResponsesByIidRDD: RDD[CountByIid] = getRtbResponseRDDKeyedByImpressionId(responsesRDD, jsonfiedCampaignAdvertMap.get(campaignId).get)
     val intersectionRDD = bidResponsesByIidRDD.intersection(notificationRDD);
     val deltaRDD = bidResponsesByIidRDD.subtractByKey(intersectionRDD)
 
