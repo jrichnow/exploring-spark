@@ -27,7 +27,7 @@ object ProfileTargetingLogFileAnalyser {
 
     val ptRDD = logFileRDD.map(line => line.split(": ")(1)).map(ProfileTargeting.fromJson(_))
 
-    val userPtRDD = ptRDD.map(filter(_))
+    val userPtRDD = ptRDD.map(filter)
 
     val finalUserPtRDD = userPtRDD.reduceByKey((x, y) => s"$x;$y")
     finalUserPtRDD.foreach(println)
@@ -40,8 +40,7 @@ object ProfileTargetingLogFileAnalyser {
 
     val writer = new PrintWriter(new File(resultFile))
     for ((key, value) <- finalCarBrandRDD.toArray) {
-      val result = s"$key: $value\n"
-      writer.write(result)
+      writer.write(s"$key: $value\n")
     }
     writer.flush
     writer.close
