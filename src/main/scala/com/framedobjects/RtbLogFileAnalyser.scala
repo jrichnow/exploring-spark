@@ -20,13 +20,13 @@ object RtbLogFileAnalyser {
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss,SSS")
 
   def main(args: Array[String]) {
-    val startDate = dateFormat.parse("2014-11-25 21:00:00,000")
-    val endDate = dateFormat.parse("2014-11-25 22:00:00,000")
+    val startDate = dateFormat.parse("2014-11-25 20:00:00,000")
+    val endDate = dateFormat.parse("2014-11-25 21:00:00,000")
 
     val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/25112014/opt_responses-433--2014-11-25--*.log.gz"
     val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/25112014/opt_notif-433--2014-11-25--*.log.gz"
 
-    val resultFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/25112014/result_21-22.txt"
+    val resultFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/25112014/result_20-21.txt"
 
     val campaignAdvertMap = Map("47247" -> List("137519", "137520", "137521"),
       "38395" -> List("111875", "111876"),
@@ -55,7 +55,7 @@ object RtbLogFileAnalyser {
 
     println("fetching notifications ...")
     val jsonfiedCampaignAdvertMap = campaignAdvertMap.mapValues(x => x.map(a => "\"aid\":" + a + ",\""))
-    
+
     val notificationsByIidRDD = getRtbNotificationsRDDKeyedByImpressionId(sparkContext, notificationFileName, startDate, endDate)
     notificationsByIidRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
@@ -81,6 +81,19 @@ object RtbLogFileAnalyser {
 
   def processCampaign(campaignId: String, startDate: Date, endDate: Date, jsonfiedAdvertList: List[String], responsesRDD: RDD[String], notificationRDD: RDD[(Long, String)]): (Long, Long, Long, String) = {
     val bidResponsesByIidRDD: RDD[CountByIid] = getRtbResponseRDDKeyedByImpressionId(startDate, endDate, responsesRDD, jsonfiedAdvertList)
+    // Temporary saving iids for certain campaign id
+    campaignId match {
+      case "38575" => {
+        val fileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/25112014/38575-iids-20-21.txt"
+        
+        val writer = new PrintWriter(new File(fileName))
+        bidResponsesByIidRDD.keys.toArray.foreach(entry => writer.println(entry))
+        writer.flush()
+        writer.close()
+      }
+      case _ => 
+    }
+
     val intersectionRDD = bidResponsesByIidRDD.intersection(notificationRDD);
     val deltaRDD = bidResponsesByIidRDD.subtractByKey(intersectionRDD)
 
