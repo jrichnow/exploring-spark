@@ -11,16 +11,17 @@ object CompareVerticaAndSparkResults {
     val sparkConfig = new SparkConf().setAppName("Test").setMaster("local").setAppName("RTB Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
     
-    val iidsSparkFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/25112014/38575-iids-20-21.txt"
-    val iidsVerticaFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/25112014/vert-38575-20-21.txt"
+    val iidsSparkFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/02122014/38575-iids-20-21.txt"
+    val iidsVerticaFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/02122014/vert-38575-0212214-20-21.txt"
       
     val iidSparkRDD = sparkContext.textFile(iidsSparkFile)
     println("spark: " + iidSparkRDD.count)
     
-    val iidVerticaRDD = sparkContext.textFile(iidsVerticaFile).map(_.trim())
+    val iidVerticaRDD = sparkContext.textFile(iidsVerticaFile)
     println("vertica: " + iidVerticaRDD.count)
     
     val uniqueIidRDD = iidVerticaRDD.subtract(iidSparkRDD)
     println("unique: " + uniqueIidRDD.count)
+    uniqueIidRDD.foreach(println)
   }
 }
