@@ -7,6 +7,8 @@ import com.framedobjects.model.OpenRtbResponseLogEntry
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import com.framedobjects.model.OpenRtbRequestLogEntry
+import java.io.PrintWriter
+import java.io.File
 
 object OpenRtbLogFileAnalyser {
 
@@ -16,6 +18,7 @@ object OpenRtbLogFileAnalyser {
 
     val responseFileName = "/users/jensr/Documents/DevNotes/investigations/openrtb/open-rtb-responses-*.log.gz"
     val requestFileName = "/users/jensr/Documents/DevNotes/investigations/openrtb/open-rtb-requests-*.log.gz"
+    val resultFile = "/users/jensr/Documents/DevNotes/investigations/openrtb/bid-responses.txt"
 
     val sparkConfig = new SparkConf().setAppName("Test").setMaster("local").setAppName("OpenRTB Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
@@ -27,8 +30,16 @@ object OpenRtbLogFileAnalyser {
 
     val responseRawRDD = sparkContext.textFile(responseFileName, 2)
     println(s"response raw count: ${responseRawRDD.count}")
+    
     val responseJsonRDD = responseRawRDD.map(convertResponseToJson(_)).filter(filterResponsesByTime(_, startDateTime, endDateTime))
     println(s"response json count: ${responseJsonRDD.count}")
+    
+    val responseTextRDD = responseJsonRDD.map(convertResponseToText(_))
+    
+    val writer = new PrintWriter(new File(resultFile))
+    responseTextRDD.toArray.foreach(entry => writer.write(s"${entry}\n"))
+    writer.flush()
+    writer.close()
 
     sparkContext.stop
   }
@@ -39,6 +50,10 @@ object OpenRtbLogFileAnalyser {
 
   def isAfterIncluding(checkTime: Long, againstTime: DateTime): Boolean = {
     getUtcDateTime(checkTime).compareTo(againstTime) >= 0
+  }
+  
+  private def convertResponseToText(entry: OpenRtbResponseLogEntry): String = {
+    s"${entry.response.id}, ${entry.response.seatbid(0).bid(0).id}, ${entry.response.seatbid(0).bid(0).price}"
   }
 
   private def convertResponseToJson(logEntry: String): OpenRtbResponseLogEntry = {
