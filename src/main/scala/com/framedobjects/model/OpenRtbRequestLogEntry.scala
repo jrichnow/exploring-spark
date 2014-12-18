@@ -8,7 +8,13 @@ case class OpenRtbRequestLogEntry(
   tpid: Int,
   request: Request)
 
-case class Request(id: String)
+case class Request(id: String, imp: Seq[Impression], site: Site, user: User)
+
+case class Impression(id: String, tagid: String)
+case class Site(id: String, publisher: Publisher)
+case class Publisher(id: String)
+
+case class User(id: String)
 
 object OpenRtbRequestLogEntry {
 

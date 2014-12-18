@@ -20,6 +20,11 @@ class OpenRtbLogFileAnalyserSpec extends FlatSpec with Matchers {
     request.time should be (1418112543570l)
     request.tpid should be (48)
     request.request.id should be ("419271418112543552")
+    request.request.imp(0).id should be ("1")
+    request.request.imp(0).tagid should be ("105175")
+    request.request.site.id should be ("29615")
+    request.request.site.publisher.id should be ("13002")
+    request.request.user.id should be ("419361418112520286")
   }
 
   "A JSON response string" should "convert to model" in {
@@ -46,5 +51,8 @@ class OpenRtbLogFileAnalyserSpec extends FlatSpec with Matchers {
 
     OpenRtbLogFileAnalyser.isAfterIncluding(1418114936743l, startDateTime) should be(false)
     OpenRtbLogFileAnalyser.isAfterIncluding(1418116646819l, startDateTime) should be(true)
+    
+    
+    println(new DateTime(1418805540400l, DateTimeZone.UTC))
   }
 }
