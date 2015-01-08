@@ -46,7 +46,7 @@ object RtbLogFileAnalyser {
   }
 
   def process(responseFileName: String, notificationFileName: String, resultFileName: String, startDate: Date, endDate: Date, campaignAdvertMap: Map[String, List[String]]) {
-    val sparkConfig = new SparkConf().setAppName("Test").setMaster("local").setAppName("RTB Log Files Investigation")
+    val sparkConfig = new SparkConf().setMaster("local").setAppName("RTB Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
 
     println("fetching bid responses ...")
