@@ -21,6 +21,12 @@ object TransferFiles {
 
     val startTime = System.currentTimeMillis()
 
+    transferFilesFromSingleApp(apps)
+
+    println(s"All done! It took ${(System.currentTimeMillis() - startTime) / 1000} seconds")
+  }
+  
+  private def transferFilesFromSingleApp(apps: Map[Int, List[Int]]) {
     for ((handler, instances) <- apps) {
       val result = instances.map(id => future { transferFileForAppInstance(id, handler) })
       result.foreach(r => {
@@ -29,8 +35,6 @@ object TransferFiles {
         }
       })
     }
-
-    println(s"All done! It took ${(System.currentTimeMillis() - startTime) / 1000} seconds")
   }
 
   private def transferFileForAppInstance(instanceId: Int, handlerType: Int): String = {
