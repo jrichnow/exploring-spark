@@ -21,15 +21,15 @@ object TransferFiles {
 
     val startTime = System.currentTimeMillis()
 
-    transferFilesFromSingleApp(apps)
+    transferErrorNotifFilesFromApps(apps)
 
     println(s"All done! It took ${(System.currentTimeMillis() - startTime) / 1000} seconds")
   }
-  
-  private def transferFilesFromSingleApp(apps: Map[Int, List[Int]]) {
+
+  private def transferErrorNotifFilesFromApps(apps: Map[Int, List[Int]]) {
     for ((handler, instances) <- apps) {
-      val result = instances.map(id => future { transferFileForAppInstance(id, handler) })
-      result.foreach(r => {
+      val resultFutureList = instances.map(id => future { transferErrorNotifFileForAppInstance(id, handler) })
+      resultFutureList.foreach(r => {
         while (!r.isCompleted) {
           Thread.sleep(1000)
         }
@@ -37,7 +37,7 @@ object TransferFiles {
     }
   }
 
-  private def transferFileForAppInstance(instanceId: Int, handlerType: Int): String = {
+  private def transferErrorNotifFileForAppInstance(instanceId: Int, handlerType: Int): String = {
     val sourceFile = s"adscale@app$instanceId://data/adscale/mbr-log/opt_notif-error-$handlerType$instanceId.log"
     val destinationFolder = "/users/jensr/Documents/DevNotes/investigations/sc-2666/08012015/"
 
@@ -45,7 +45,6 @@ object TransferFiles {
     val result = s"scp $sourceFile $destinationFolder" !!
 
     println(s"app$handlerType$instanceId: file transfer complete with result: '$result'")
-
     result
   }
 }
