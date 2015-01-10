@@ -14,7 +14,7 @@ object MbrErrorNotificationLogFileAnalyser {
     val startDate = RtbLogFileAnalyser.dateFormat.parse("2015-01-08 00:00:00,000")
     val endDate = RtbLogFileAnalyser.dateFormat.parse("2015-01-09 00:00:00,000")
 
-    val fileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/08012015/opt_notif-error-*.log"
+    val fileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/08012015/opt_notif-error-*.log.gz"
 
     processFile(fileName, startDate, endDate)
   }
@@ -25,7 +25,6 @@ object MbrErrorNotificationLogFileAnalyser {
 
     val errorNotifFileRDD = sparkContext.textFile(fileName, 2).filter(_.contains("BidOptimisationWinLossNotification")).filter(filterLogFileByTime(_, startDate, endDate))
     val notificationRDD = errorNotifFileRDD.map(mapToNotification)
-//    notificationRDD.foreach(println)
 
     val advertRDD = notificationRDD.filter(_.winningAdvertId == 140246)
     val winningAdvertRDD = advertRDD.filter(_.win)
