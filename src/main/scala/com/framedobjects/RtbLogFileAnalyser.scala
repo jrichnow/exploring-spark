@@ -20,27 +20,29 @@ object RtbLogFileAnalyser {
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss,SSS")
 
   def main(args: Array[String]) {
-    val startDate = dateFormat.parse("2014-12-02 20:00:00,000")
-    val endDate = dateFormat.parse("2014-12-02 21:00:00,000")
+    val startDate = dateFormat.parse("2015-01-09 20:00:00,000")
+    val endDate = dateFormat.parse("2015-01-09 22:00:00,000")
 
-    val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/02122014/opt_responses-435--2014-12-02--*.log.gz"
-    val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/02122014/opt_notif-435--2014-12-02--*.log.gz"
+    val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/opt_responses-435-*.log.gz"
+    val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/opt_notif-435-*.log.gz"
 
-    val resultFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/02122014/result_20-21.txt"
+    val resultFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/result_435_20-22.txt"
 
-    val campaignAdvertMap = Map("47247" -> List("137519", "137520", "137521"),
-      "38395" -> List("111875", "111876"),
-      "34495" -> List("99510", "99518", "99519", "99520", "99521"),
-      "34496" -> List("99511", "99522", "99523", "99524", "99525"),
-      "34497" -> List("99512", "99527", "99529", "99526", "99528"),
-      "35433" -> List("102794", "102796", "102797", "102798", "102799", "112085"),
-      "38575" -> List("112444", "112445"),
-      "46172" -> List("134836", "134835", "134834"),
-      "46271" -> List("135050", "135049", "135048"),
-      "46591" -> List("135881", "135880", "135879"),
-      "44587" -> List("137796", "132149", "131316", "131317", "129859", "130212"),
-      "44863" -> List("137794", "137140", "130885", "131806", "130882"),
-      "22108" -> List("60456", "62510", "81217", "60457", "60458", "81216", "81215", "99545", "99547"))
+    val campaignAdvertMap = Map(
+      "48508" -> List("140246"))
+//      "47247" -> List("137519", "137520", "137521"),
+//      "38395" -> List("111875", "111876"),
+//      "34495" -> List("99510", "99518", "99519", "99520", "99521"),
+//      "34496" -> List("99511", "99522", "99523", "99524", "99525"),
+//      "34497" -> List("99512", "99527", "99529", "99526", "99528"),
+//      "35433" -> List("102794", "102796", "102797", "102798", "102799", "112085"),
+//      "38575" -> List("112444", "112445"),
+//      "46172" -> List("134836", "134835", "134834"),
+//      "46271" -> List("135050", "135049", "135048"),
+//      "46591" -> List("135881", "135880", "135879"),
+//      "44587" -> List("137796", "132149", "131316", "131317", "129859", "130212"),
+//      "44863" -> List("137794", "137140", "130885", "131806", "130882"),
+//      "22108" -> List("60456", "62510", "81217", "60457", "60458", "81216", "81215", "99545", "99547"))
 
     process(responseFileName, notificationFileName, resultFileName, startDate, endDate, campaignAdvertMap)
   }
@@ -83,8 +85,8 @@ object RtbLogFileAnalyser {
     val bidResponsesByIidRDD: RDD[CountByIid] = getRtbResponseRDDKeyedByImpressionId(startDate, endDate, responsesRDD, jsonfiedAdvertList)
     // Temporary saving iids for certain campaign id
     campaignId match {
-      case "38575" => {
-        val fileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/02122014/38575-iids-20-21.txt"
+      case "48508" => {
+        val fileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/48508_435-iids-20-22.txt"
         
         val writer = new PrintWriter(new File(fileName))
         notificationRDD.keys.toArray.foreach(entry => writer.println(entry))

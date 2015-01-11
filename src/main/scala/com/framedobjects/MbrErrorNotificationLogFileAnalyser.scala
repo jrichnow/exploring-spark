@@ -11,16 +11,16 @@ object MbrErrorNotificationLogFileAnalyser {
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss,SSS")
 
   def main(args: Array[String]) {
-    val startDate = RtbLogFileAnalyser.dateFormat.parse("2015-01-08 00:00:00,000")
-    val endDate = RtbLogFileAnalyser.dateFormat.parse("2015-01-09 00:00:00,000")
+    val startDate = RtbLogFileAnalyser.dateFormat.parse("2015-01-09 20:00:00,000")
+    val endDate = RtbLogFileAnalyser.dateFormat.parse("2015-01-09 22:00:00,000")
 
-    val fileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/08012015/opt_notif-error-*.log.gz"
+    val fileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/opt_notif-error-435*.log.gz"
 
     processFile(fileName, startDate, endDate)
   }
 
   def processFile(fileName: String, startDate: Date, endDate: Date) {
-    val sparkConfig = new SparkConf().setMaster("local").setAppName("MBR Notiifcatoin Log Files Investigation")
+    val sparkConfig = new SparkConf().setMaster("local").setAppName("MBR Notification Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
 
     val errorNotifFileRDD = sparkContext.textFile(fileName, 2).filter(_.contains("BidOptimisationWinLossNotification")).filter(filterLogFileByTime(_, startDate, endDate))
