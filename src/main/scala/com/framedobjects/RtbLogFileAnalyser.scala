@@ -26,11 +26,11 @@ object RtbLogFileAnalyser {
     val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/opt_responses-435-*.log.gz"
     val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/opt_notif-435-*.log.gz"
 
-    val resultFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/spark_46172_result_435_20-21.txt"
+    val resultFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/48523/spark_48523_result_435_20-21.txt"
 
     val campaignAdvertMap = Map(
 //      "48508" -> List("140246"))
-      "46172" -> List("134834", "134835", "134836"))
+      "48523" -> List("140278"))
     //      "47247" -> List("137519", "137520", "137521"),
     //      "38395" -> List("111875", "111876"),
     //      "34495" -> List("99510", "99518", "99519", "99520", "99521"),
@@ -86,8 +86,8 @@ object RtbLogFileAnalyser {
     val bidResponsesByIidRDD: RDD[CountByIid] = getRtbResponseRDDKeyedByImpressionId(startDate, endDate, responsesRDD, jsonfiedAdvertList)
     // Temporary saving iids for certain campaign id
     campaignId match {
-      case "46172" => {
-        val fileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/spark_46172_435-iids-20-21.txt"
+      case "48523" => {
+        val fileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/48523/spark_48523_435-iids-20-21.txt"
 
         val writer = new PrintWriter(new File(fileName))
         bidResponsesByIidRDD.keys.toArray.foreach(entry => writer.println(entry))
@@ -123,10 +123,10 @@ object RtbLogFileAnalyser {
   }
 
   private def printWinningNotificationsForAdvert(winningNotificationsRDD: RDD[String], advertId: String) {
-    val winningNotificationsForAdvert = winningNotificationsRDD.filter(x => x.contains("\"aid\":134834,\"") || x.contains("\"aid\":134835,\"") || x.contains("\"aid\":134836,\""))
+    val winningNotificationsForAdvert = winningNotificationsRDD.filter(x => x.contains("\"aid\":140278,\""))
     val winningNotificationsIidsForAdvert = winningNotificationsForAdvert.map(mapNotificationJsonToIIdKey)
     
-    val fileName = s"/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/spark_46172_winning-iids-20-21.txt"
+    val fileName = s"/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/48523/spark_48523_winning-iids-20-21.txt"
     val writer = new PrintWriter(new File(fileName))
     winningNotificationsIidsForAdvert.keys.toArray.foreach(entry => writer.println(entry))
     writer.flush()
