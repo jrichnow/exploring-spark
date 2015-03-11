@@ -18,19 +18,19 @@ object SingleCampaignRtbLogFileAnalyser {
   type CountByIid = (Long, String)
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss,SSS")
-  val startHour = 20
-  val endHour = 21
-  val startDate = dateFormat.parse(s"2015-01-09 ${startHour}:00:00,000")
-  val endDate = dateFormat.parse(s"2015-01-09 ${endHour}:00:00,000")
+  val startHour = 00
+  val endHour = 24
+  val startDate = dateFormat.parse(s"2015-01-26 ${startHour}:00:00,000")
+  val endDate = dateFormat.parse(s"2015-01-26 ${endHour}:00:00,000")
 
-  val campaignId = 48573
-  val advertIds = List(140391)
+  val campaignId = 48693
+  val advertIds = List(140651, 140652, 140653)
   val campaignAdvertMap = Map(campaignId -> advertIds)
   val jsonfiedCampaignAdvertMap = campaignAdvertMap.mapValues(x => x.map(a => "\"aid\":" + a + ",\""))
 
-  val handlerInstance = 435
+  val handlerInstance = 435;
 
-  val investigationRootFolder = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015"
+  val investigationRootFolder = "/users/jensr/Documents/DevNotes/investigations/sc-2666/26012015"
 
   val responseLogFileName = s"${investigationRootFolder}/logs/opt_responses-${handlerInstance}-*.log.gz"
   val notificationLogFileName = s"${investigationRootFolder}/logs/opt_notif-${handlerInstance}-*.log.gz"
@@ -53,21 +53,21 @@ object SingleCampaignRtbLogFileAnalyser {
     val notificationsByIidRDD = getRtbNotificationsRDDKeyedByImpressionId(sparkContext, jsonfiedCampaignAdvertMap.get(campaignId).get)
     notificationsByIidRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
-    val writer = new PrintWriter(new File(sparkResultFileName))
-    writer.write("cid\tresp\tnotif\tdelta\tperc\tiids not in notification\n")
-
-    for (campaignId <- jsonfiedCampaignAdvertMap.keySet) {
-      val (responses, notifications, delta, iids) = processCampaign(jsonfiedCampaignAdvertMap.get(campaignId).get, responsesFileRDD, notificationsByIidRDD)
-      val perc = calculatePercentage(responses, notifications)
-      val percEval: Double = perc match {
-        case a if a.isNaN() => 0
-        case x => x
-      }
-      println(s"campaign: $campaignId - perc: $perc, percEval: $percEval")
-      val percentage = BigDecimal(percEval).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-      writer.write(s"$campaignId\t$responses\t$notifications\t$delta\t$percentage\t$iids\n")
-    }
-    writer.close
+//    val writer = new PrintWriter(new File(sparkResultFileName))
+//    writer.write("cid\tresp\tnotif\tdelta\tperc\tiids not in notification\n")
+//
+//    for (campaignId <- jsonfiedCampaignAdvertMap.keySet) {
+//      val (responses, notifications, delta, iids) = processCampaign(jsonfiedCampaignAdvertMap.get(campaignId).get, responsesFileRDD, notificationsByIidRDD)
+//      val perc = calculatePercentage(responses, notifications)
+//      val percEval: Double = perc match {
+//        case a if a.isNaN() => 0
+//        case x => x
+//      }
+//      println(s"campaign: $campaignId - perc: $perc, percEval: $percEval")
+//      val percentage = BigDecimal(percEval).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+//      writer.write(s"$campaignId\t$responses\t$notifications\t$delta\t$percentage\t$iids\n")
+//    }
+//    writer.close
 
     sparkContext.stop
   }

@@ -23,8 +23,8 @@ object RtbLogFileAnalyser {
     val startDate = dateFormat.parse("2015-01-09 20:00:00,000")
     val endDate = dateFormat.parse("2015-01-09 21:00:00,000")
 
-    val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/opt_responses-435-*.log.gz"
-    val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/opt_notif-435-*.log.gz"
+    val responseFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/26012015/opt_responses-435-*.log.gz"
+    val notificationFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/26012015/opt_notif-435-*.log.gz"
 
     val resultFileName = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/48523/spark_48523_result_435_20-21.txt"
 

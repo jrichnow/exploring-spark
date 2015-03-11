@@ -13,8 +13,13 @@ object CompareVerticaAndSparkResults {
     val sparkConfig = new SparkConf().setMaster("local").setAppName("RTB Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
     
-    val iidsSparkFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/48508_winning-iids-20-21.txt"
-    val iidsVerticaFile = "/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/vert-48508-09012015-20-21.txt"
+    val investigationRoot = "/users/jensr/Documents/DevNotes/investigations/sc-2666/15012015"
+    val campaignId = 48520
+    val handlerId = 435
+    val fileNameIdentifiers = s"${campaignId}_${handlerId}_20_21"
+    
+    val iidsSparkFile = s"${investigationRoot}/${campaignId}/spark_${fileNameIdentifiers}-win-notification-iids.txt"
+    val iidsVerticaFile = s"${investigationRoot}/${campaignId}/vert_${fileNameIdentifiers}-iids.txt"
       
     val iidSparkRDD = sparkContext.textFile(iidsSparkFile)
     println("spark: " + iidSparkRDD.count)
@@ -22,17 +27,17 @@ object CompareVerticaAndSparkResults {
     val iidVerticaRDD = sparkContext.textFile(iidsVerticaFile)
     println("vertica: " + iidVerticaRDD.count)
     
-    val uniqueIidRDD = iidVerticaRDD.subtract(iidSparkRDD)
+//    val uniqueIidRDD = iidVerticaRDD.subtract(iidSparkRDD)
+    val uniqueIidRDD = iidSparkRDD.subtract(iidVerticaRDD)
     println("unique: " + uniqueIidRDD.count)
-    uniqueIidRDD.foreach(println)
     
-    val fileName = s"/users/jensr/Documents/DevNotes/investigations/sc-2666/09012015/48508_delta-iids-20-21.txt"
+    val fileName = s"${investigationRoot}/${campaignId}/spark_${fileNameIdentifiers}_delta-iids.txt"
     val writer = new PrintWriter(new File(fileName))
     uniqueIidRDD.toArray.foreach(entry => writer.println(entry))
     writer.flush()
     writer.close()
     
-//    println(uniqueIidRDD.toArray.mkString(","))
+    println(uniqueIidRDD.top(20).toArray.mkString(","))
     
     sparkContext.stop
   }

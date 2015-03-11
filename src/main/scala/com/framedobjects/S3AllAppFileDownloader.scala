@@ -4,20 +4,18 @@ import java.io.File
 
 object S3AllAppFileDownloader {
 
-  private val outputFolder = "/tmp/s3/"
+  private val outputFolder = "/users/jensr/Documents/DevNotes/investigations/sc-2666/15012015/logs"
   private val bucketName = "rtb-archive"
 
   def main(args: Array[String]) {
     val ih = 4
     val dh = 3
-//    val ihInstances = List(14, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36)
-//    val dhInstances = List(20, 21, 26, 27, 29, 30, 31, 32, 33, 34)
-    val ihInstances = List(35, 36)
-    val dhInstances = List()
+    val ihInstances = List(14, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36)
+    val dhInstances = List(20, 21, 26, 27, 29, 30, 31, 32, 33, 34)
 
     val apps = Map(ih -> ihInstances, dh -> dhInstances)
 
-    val fileParts = List(0, 1, 2, 3, 4, 5)
+    val fileParts = List(0, 1, 2)
 
     val startTime = System.currentTimeMillis()
     
@@ -37,8 +35,8 @@ object S3AllAppFileDownloader {
   }
 
   private def transferFilePart(handlerType: Int, instanceId: Int, filePart: Int) {
-    val s3File = s"mbr_responses/20150109/opt_responses-${handlerType}${instanceId}--2015-01-09--${filePart}.log.gz"
-//    val s3File = s"mbr_notifications/20150109/opt_notif-${handlerType}${instanceId}--2015-01-09--${filePart}.log.gz"
+//    val s3File = s"mbr_responses/20150114/opt_responses-${handlerType}${instanceId}--2015-01-14--${filePart}.log.gz"
+    val s3File = s"mbr_notifications/20150115/opt_notif-${handlerType}${instanceId}--2015-01-15--${filePart}.log.gz"
     println(s3File)
 
     val fileName = s3File.split("/")(2)
