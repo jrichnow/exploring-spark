@@ -6,7 +6,8 @@ import net.liftweb.json.parse
 case class AdscaleResponseLogEntry(
   bid: AdscaleBid)
 
-case class AdscaleBid(cpm: Double)
+case class AdscaleBid(
+    cpm: Double)
 
 object AdscaleResponseLogEntry {
 
