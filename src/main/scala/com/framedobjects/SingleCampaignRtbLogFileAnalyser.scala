@@ -18,7 +18,7 @@ object SingleCampaignRtbLogFileAnalyser {
   type CountByIid = (Long, String)
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss,SSS")
-  val startHour = 00
+  val startHour = 0
   val endHour = 24
   val startDate = dateFormat.parse(s"2015-01-26 ${startHour}:00:00,000")
   val endDate = dateFormat.parse(s"2015-01-26 ${endHour}:00:00,000")
