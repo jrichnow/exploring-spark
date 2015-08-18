@@ -7,13 +7,13 @@ case class IhAccessLog(
   time: Long,
   path: Option[String],
   ref: Option[String],
-  ua: String,
+  ua: Option[String],
   query: String,
   ip: String,
   data: Option[Data]) {
 
   override def toString(): String = {
-    s"$time\t${path.getOrElse("/pup")}\t$query\t${ref.getOrElse("no referrer header")}\t$ua"
+    s"$time\t${path.getOrElse("/pup")}\t$query\t${ref.getOrElse("no referrer header")}\t${ua.getOrElse("no user agent")}"
   }
 
   def hasWsParamValue(): Boolean = {
