@@ -9,16 +9,16 @@ import java.io.File
 
 object AppnexusPlacementLoggerAnalyser {
 
-  val investigationRootFolder = "/users/jensr/Documents/DevNotes/investigations/appnexus/logs"
-  val requestHttpFileName = s"$investigationRootFolder/dsp-appnexus-bidrequest-401.log"
-  val responseHttpFileName = s"$investigationRootFolder/dsp-appnexus-bidresponse-401.log"
-  val resultFileName = s"$investigationRootFolder/appnexus_error_5_requests.log"
+  val investigationRootFolder = "/users/jensr/Documents/DevNotes/investigations/appnexus/blacklisting/logs"
+  val requestHttpFileName = s"$investigationRootFolder/dsp-appnexus-bidrequest-401*"
+  val responseHttpFileName = s"$investigationRootFolder/dsp-appnexus-bidresponse-401*"
+  val resultFileName = s"$investigationRootFolder/appnexus_error_8_requests.log"
 
   def main(args: Array[String]) {
     val sparkConfig = new SparkConf().setMaster("local").setAppName("Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
 
-    val filteredResponseRDD = sparkContext.textFile(responseHttpFileName).filter(_.contains("request_error_id\":5"));
+    val filteredResponseRDD = sparkContext.textFile(responseHttpFileName).filter(_.contains("request_error_id\":8"));
     val keyedResponseRDD = filteredResponseRDD.map(keyResponse(_))
     keyedResponseRDD.top(10).foreach(println)
     println(keyedResponseRDD.count)
@@ -36,6 +36,9 @@ object AppnexusPlacementLoggerAnalyser {
     println(jsonRequestRDD.count)
     
     writeResultFile(resultFileName, jsonRequestRDD.toArray)
+    
+    val blacklistedUrlsRDD = jsonRequestRDD.map(AppnexusRequestLogEntry.fromJson(_)).map(_.page_url).distinct.toArray().toSeq.sorted
+    blacklistedUrlsRDD.foreach(println)
   }
 
   private def keyResponse(line: String): (String, String) = {
@@ -44,8 +47,8 @@ object AppnexusPlacementLoggerAnalyser {
   }
 
   private def keyRequest(line: String): (String, String) = {
-    val array = line.split(", ")
-    (array(0), array(1))
+    val array = line.split(", \\{")
+    (array(0), s"{${array(1)}")
   }
 
   private def mapJoinedValues(map: (String, String)): String = {
