@@ -12,13 +12,13 @@ import com.framedobjects.model.IhAccessLog
 
 object IhAccessLogger {
 
-  //    val slotId = "NDdiMDA" //73408
-  //	val slotId = "NGNjYjgw" //78638
-  val slotId = "NzFkODgw" //116578
+//  val slotId = "NDdiMDA" //73408
+  	val slotId = "NGNjYjgw" //78638
+  //  val slotId = "NzFkODgw" //116578
 
   def main(args: Array[String]) {
-    val investigationRootFolder = "/users/jensr/Documents/DevNotes/investigations/adscale-1147"
-    val logFileName = s"$investigationRootFolder/logs/20150815/ih-access-401--2015-08-15--*.log.gz"
+    val investigationRootFolder = "/users/jensr/Documents/DevNotes/investigations/pu"
+    val logFileName = s"$investigationRootFolder/log/ih-access-401.log"
 
     val sparkConfig = new SparkConf().setMaster("local").setAppName("Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
@@ -36,9 +36,10 @@ object IhAccessLogger {
     println(s"Full sequence >= 5: ${fullSequenceRDD.count}")
 
     val filteredMissingWsRDD = groupedByIidRDD.filter(filterEmptyWsParam)
+//    filteredMissingWsRDD.foreach(println)
     println(s"Missing ws value and >= 5: ${filteredMissingWsRDD.count}")
 
-    //    writeResultFile(s"$investigationRootFolder/$slotId.txt", filteredMissingWsRDD.toArray())
+    writeResultFile(s"$investigationRootFolder/$slotId.txt", filteredMissingWsRDD.toArray())
     val userAgentRDD = filteredMissingWsRDD.map(mapUserAgentSimple(_))
     val userAgentCount = userAgentRDD.count()
     println(s"Number of user agent points: ${userAgentCount}")

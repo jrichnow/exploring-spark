@@ -14,7 +14,8 @@ case class AppnexusRequestLogEntry(
     ext_site_code: String,
     ext_placement_code: String,
     ip_address: String,
-    user_agent: String)
+    user_agent: String,
+    page_url: String)
 
 object AppnexusRequestLogEntry {
 

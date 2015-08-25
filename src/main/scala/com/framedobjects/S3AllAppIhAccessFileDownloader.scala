@@ -3,8 +3,10 @@ package com.framedobjects
 import java.io.File
 
 object S3AllAppIhAccessFileDownloader {
+  
+  // TODO introduce a date val such as val date = "20150824" and replace all over in correct format
 
-  private val outputFolder = "/users/jensr/Documents/DevNotes/investigations/adscale-1147/logs/20150815"
+  private val outputFolder = "/users/jensr/Documents/DevNotes/investigations/adscale-1182/logs/20150824"
   private val bucketName = "rtb-archive"
 
   def main(args: Array[String]) {
@@ -15,7 +17,7 @@ object S3AllAppIhAccessFileDownloader {
     val apps = Map(ih -> ihInstances)
 
 //    val fileParts = List(0, 1, 2, 3, 4)
-    val fileParts = (5 to 91).toList
+    val fileParts = (0 to 147).toList
 
     val startTime = System.currentTimeMillis()
     
@@ -35,7 +37,7 @@ object S3AllAppIhAccessFileDownloader {
   }
 
   private def transferFilePart(handlerType: Int, instanceId: String, filePart: Int) {
-    val s3File = s"ih_access/20150815/ih-access-${handlerType}${instanceId}--2015-08-15--${filePart}.log.gz"
+    val s3File = s"ih_access/20150824/ih-access-${handlerType}${instanceId}--2015-08-24--${filePart}.log.gz"
     println(s3File)
 
     val fileName = s3File.split("/")(2)
