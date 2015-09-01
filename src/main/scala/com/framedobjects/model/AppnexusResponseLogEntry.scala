@@ -4,7 +4,8 @@ import net.liftweb.json.DefaultFormats
 import net.liftweb.json.parse
 
 case class AppnexusResponseLogEntry(
-  no_bid: Boolean)
+  no_bid: Boolean,
+  bid: Option[Double])
 
 object AppnexusResponseLogEntry {
 

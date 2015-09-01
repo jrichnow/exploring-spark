@@ -1,4 +1,4 @@
-package com.framedobjects
+package com.framedobjects.s3
 
 import java.io.File
 
@@ -18,9 +18,9 @@ object S3AllAppFileDownloader {
     val fileParts = List(0, 1, 2)
 
     val startTime = System.currentTimeMillis()
-    
+
     transferFiles(apps, fileParts)
-    
+
     println(s"All done! It took ${(System.currentTimeMillis() - startTime) / 1000} seconds")
   }
 
@@ -35,7 +35,7 @@ object S3AllAppFileDownloader {
   }
 
   private def transferFilePart(handlerType: Int, instanceId: Int, filePart: Int) {
-//    val s3File = s"mbr_responses/20150114/opt_responses-${handlerType}${instanceId}--2015-01-14--${filePart}.log.gz"
+    //    val s3File = s"mbr_responses/20150114/opt_responses-${handlerType}${instanceId}--2015-01-14--${filePart}.log.gz"
     val s3File = s"mbr_notifications/20150115/opt_notif-${handlerType}${instanceId}--2015-01-15--${filePart}.log.gz"
     println(s3File)
 

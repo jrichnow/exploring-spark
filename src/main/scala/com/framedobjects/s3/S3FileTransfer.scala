@@ -1,4 +1,4 @@
-package com.framedobjects
+package com.framedobjects.s3
 
 import awscala.Region
 import awscala.s3.S3
@@ -6,7 +6,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.io.InputStream
-import awscala.s3.Bucket
 
 object S3FileTransfer {
 

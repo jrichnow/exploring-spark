@@ -1,4 +1,4 @@
-package com.framedobjects
+package com.framedobjects.s3
 
 import java.io.File
 

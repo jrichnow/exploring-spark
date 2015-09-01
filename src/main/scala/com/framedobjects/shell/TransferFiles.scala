@@ -8,8 +8,15 @@ import scala.concurrent.duration._
 import scala.util.Success
 import scala.util.Failure
 import scala.concurrent.Future
+import scala.util.matching.Regex
 
 object TransferFiles {
+  
+  val sourceRoot = "//data/adscale/dsp-log"
+  val date = "2015-08-31" 
+  val handler = "01"
+  
+  val destinationFolder = s"/users/jensr/Documents/DevNotes/investigations/adscale-1213/logs/$date/"
 
   def main(args: Array[String]) {
     val ih = 4
@@ -18,12 +25,36 @@ object TransferFiles {
     val dhInstances = List(20, 21, 26, 27, 29, 30, 31, 32, 33, 34)
 
     val apps = Map(ih -> ihInstances, dh -> dhInstances)
-
-    val startTime = System.currentTimeMillis()
-
-    transferErrorNotifFilesFromApps(apps)
-
-    println(s"All done! It took ${(System.currentTimeMillis() - startTime) / 1000} seconds")
+    
+//    getLogFiles("dsp-adscale-bidrequest-", (0 to 21).toList)
+//    getLogFiles("dsp-adscale-bidresponse-", (0 to 14).toList)
+//    getLogFiles("dsp-openrtb-bidrequest-", (0 to 16).toList)
+//    getLogFiles("dsp-openrtb-bidresponse-", (0 to 20).toList)
+  }
+  
+  private def getLogFiles(fileRoot: String, fileParts: List[Int]) {
+    for (file <- fileParts) {
+      val fileName = s"adscale@app$handler:$sourceRoot/${fileRoot}4${handler}--$date--$file.log.gz"
+      transferFile(fileName, destinationFolder)
+    }
+    val fileRootRegex = fileRoot.r
+    while (!checkFileCount(destinationFolder, fileRootRegex, fileParts.length)) {
+      Thread.sleep(1000)
+    }
+  }
+  
+  private def checkFileCount(destinationFolder:String, fileRegex: Regex, expectedNumberOfFiles: Int): Boolean = {
+    val result = s"ls -l $destinationFolder"!!
+    
+    fileRegex.findAllIn(result).length == expectedNumberOfFiles
+  }
+  
+  private def transferFile(sourceFileName: String, destinationFolder: String):Future[String] = Future {
+    println(s"transfering $sourceFileName ...")
+	  val result = s"scp $sourceFileName $destinationFolder" !!
+    
+    println(s"... $sourceFileName transfer done with result of $result")
+    result
   }
 
   private def transferErrorNotifFilesFromApps(apps: Map[Int, List[Int]]) {
@@ -36,7 +67,7 @@ object TransferFiles {
       })
     }
   }
-
+  
   private def transferErrorNotifFileForAppInstance(instanceId: Int, handlerType: Int): String = {
     val sourceFile = s"adscale@app$instanceId://data/adscale/mbr-log/opt_notif-error-$handlerType$instanceId.log"
     val destinationFolder = "/users/jensr/Documents/DevNotes/investigations/sc-2666/08012015/"

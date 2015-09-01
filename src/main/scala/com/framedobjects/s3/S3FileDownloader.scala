@@ -1,19 +1,15 @@
-package com.framedobjects
+package com.framedobjects.s3
 
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-
-import scala.collection.JavaConverters.asScalaBufferConverter
-
 import com.amazonaws.services.s3.model.ListObjectsRequest
 import com.amazonaws.services.s3.model.S3ObjectSummary
-
 import awscala.File
 import awscala.Region
 import awscala.s3.Bucket
 import awscala.s3.S3
-import awscala.s3.S3Object
+import scala.collection.JavaConverters._
 
 object S3FileDownloader {
 
