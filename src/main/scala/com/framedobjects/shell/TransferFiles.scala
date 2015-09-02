@@ -13,7 +13,7 @@ import scala.util.matching.Regex
 object TransferFiles {
   
   val sourceRoot = "//data/adscale/dsp-log"
-  val date = "2015-08-31" 
+  val date = "2015-09-02" 
   val handler = "01"
   
   val destinationFolder = s"/users/jensr/Documents/DevNotes/investigations/adscale-1213/logs/$date/"
@@ -26,10 +26,10 @@ object TransferFiles {
 
     val apps = Map(ih -> ihInstances, dh -> dhInstances)
     
-//    getLogFiles("dsp-adscale-bidrequest-", (0 to 21).toList)
-//    getLogFiles("dsp-adscale-bidresponse-", (0 to 14).toList)
-//    getLogFiles("dsp-openrtb-bidrequest-", (0 to 16).toList)
-//    getLogFiles("dsp-openrtb-bidresponse-", (0 to 20).toList)
+//    getLogFiles("dsp-adscale-bidrequest-", (0 to 24).toList)
+//    getLogFiles("dsp-adscale-bidresponse-", (0 to 18).toList)
+//    getLogFiles("dsp-openrtb-bidrequest-", (0 to 17).toList)
+//    getLogFiles("dsp-openrtb-bidresponse-", (0 to 13).toList)
   }
   
   private def getLogFiles(fileRoot: String, fileParts: List[Int]) {
