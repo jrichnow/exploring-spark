@@ -4,10 +4,11 @@ import net.liftweb.json.DefaultFormats
 import net.liftweb.json.parse
 
 case class OpenRtbResponseLogEntry(
-  time: Long,
-  tpid: Int,
-  responseTime: Int,
-  response: BidResponse)
+                                    time: Long,
+                                    tpid: Int,
+                                    requestId: String,
+                                    responseTime: Int,
+                                    response: BidResponse)
 
 case class BidResponse(id: String, seatbid: Seq[BidWrapper])
 

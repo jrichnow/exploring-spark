@@ -18,7 +18,7 @@ object S3FileDownloader {
 
   def main(args: Array[String]) {
     val bucketName = "rtb-archive"
-    val prefix = "mbr_notifications/20150109/opt_notif-error"
+    val prefix = "mbr_notifications/20151104/opt_notif-4"
 
     val outputFolder = "/tmp/s3/"
 
