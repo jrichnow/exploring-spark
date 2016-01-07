@@ -13,28 +13,26 @@ import scala.util.matching.Regex
 object TransferFiles {
   
   val sourceRoot = "//data/adscale/dsp-log"
-  val date = "2015-09-02" 
-  val handler = "01"
-  
-  val destinationFolder = s"/users/jensr/Documents/DevNotes/investigations/adscale-1213/logs/$date/"
+  val date = "2016-01-06"
+
+  val destinationFolder = s"/users/jensr/Documents/DevNotes/investigations/adscale-1559/logs/$date/"
 
   def main(args: Array[String]) {
-    val ih = 4
-    val dh = 3
-    val ihInstances = List(14, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36)
-    val dhInstances = List(20, 21, 26, 27, 29, 30, 31, 32, 33, 34)
+    val dhList = (1 to 8).toList.map(x => s"0$x")
+    for (dh <- dhList) {
+//      getGzLogFiles(dh, "dsp-adscale-bidresponse-", (0 to 7).toList)
+//      getLogFiles(dh, "dsp-adscale-bidresponse-3")
+      getLogFiles(dh, "dsp-adscale-notification-3")
+    }
 
-    val apps = Map(ih -> ihInstances, dh -> dhInstances)
-    
-//    getLogFiles("dsp-adscale-bidrequest-", (0 to 24).toList)
 //    getLogFiles("dsp-adscale-bidresponse-", (0 to 18).toList)
 //    getLogFiles("dsp-openrtb-bidrequest-", (0 to 17).toList)
 //    getLogFiles("dsp-openrtb-bidresponse-", (0 to 13).toList)
   }
-  
-  private def getLogFiles(fileRoot: String, fileParts: List[Int]) {
+
+  private def getGzLogFiles(handler: String, fileRoot: String, fileParts: List[Int]) {
     for (file <- fileParts) {
-      val fileName = s"adscale@app$handler:$sourceRoot/${fileRoot}4${handler}--$date--$file.log.gz"
+      val fileName = s"adscale@app$handler:$sourceRoot/${fileRoot}${handler}--$date--$file.log.gz"
       transferFile(fileName, destinationFolder)
     }
     val fileRootRegex = fileRoot.r
@@ -42,11 +40,26 @@ object TransferFiles {
       Thread.sleep(1000)
     }
   }
+
+  private def getLogFiles(handler: String, fileRoot: String) {
+    val fileName = s"adscale@app$handler:$sourceRoot/${fileRoot}${handler}.log"
+    transferFile(fileName, destinationFolder)
+
+    while (!checkFileHasTransferred(destinationFolder, s"${fileRoot}${handler}.log")) {
+      Thread.sleep(1000)
+    }
+  }
   
   private def checkFileCount(destinationFolder:String, fileRegex: Regex, expectedNumberOfFiles: Int): Boolean = {
     val result = s"ls -l $destinationFolder"!!
-    
+
     fileRegex.findAllIn(result).length == expectedNumberOfFiles
+  }
+
+  private def checkFileHasTransferred(destinationFolder:String, fileName: String): Boolean = {
+    val result = s"ls -l $destinationFolder"!!
+
+    result.contains(fileName)
   }
   
   private def transferFile(sourceFileName: String, destinationFolder: String):Future[String] = Future {
