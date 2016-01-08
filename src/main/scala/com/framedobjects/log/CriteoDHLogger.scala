@@ -1,6 +1,6 @@
 package com.framedobjects.log
 
-import com.framedobjects.model.{AdscaleNotification, AdscaleResponseLogEntry}
+import com.framedobjects.model.{ShowHandlerLog, SspBidResponse, AdscaleNotification, AdscaleResponseLogEntry}
 import org.apache.spark.{SparkContext, SparkConf}
 
 object CriteoDHLogger {
@@ -9,7 +9,8 @@ object CriteoDHLogger {
     val investigationRootFolder = "/users/jensr/Documents/DevNotes/investigations/adscale-1559"
     val dspResponseFile = s"$investigationRootFolder/logs/2016-01-06/dsp-adscale-bidresponse-301.log"
     val dspNotificationFile = s"$investigationRootFolder/logs/2016-01-06/dsp-adscale-notification-301.log"
-    val sspResponseFile = s"$investigationRootFolder/logs/2016-01-06/ssp-openrtb-bidresponse-301.log"
+    val sspResponseFile = s"$investigationRootFolder/logs/2016-01-06/ssp-openrtb-bidresponse-30*.log"
+    val showHandlerFile = s"$investigationRootFolder/logs/2016-01-06/showhandler-30*.log"
 
     val sparkConfig = new SparkConf().setMaster("local").setAppName("Criteo Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
@@ -33,11 +34,17 @@ object CriteoDHLogger {
     dspMappedSamePriceRDD.foreach(println)
 
     // SSP Bid Responses.
+    val iidArray = dspSamePriceRDD.keys.map(_.substring(0,18)).toArray
     println("processing ssp responses ...")
     val sspResponseRDD = sparkContext.textFile(sspResponseFile)
-    val iidArray = dspSamePriceRDD.keys.map(_.substring(0,18)).toArray
-    val sspFilteredResponseRDD = sspResponseRDD.filter(filterIid(_, iidArray))
-    sspFilteredResponseRDD.foreach(println)
+    val sspFilteredResponseRDD = sspResponseRDD.filter(filterIid(_, iidArray)).map(keySspBidResponse(_))
+
+    val threeBidsKeyedByIidRDD = dspMappedSamePriceRDD.join(sspFilteredResponseRDD)
+
+    // Show Handler.
+    val showRDD = sparkContext.textFile(showHandlerFile).filter(filterIid(_, iidArray)).map(keyShowHandlerLog(_))
+    val fourRDD = threeBidsKeyedByIidRDD.join(showRDD)
+    fourRDD.foreach(println)
   }
 
   private def filterByPartnerId(line: String): Boolean = {
@@ -70,4 +77,16 @@ object CriteoDHLogger {
     val (winNotificationPrice, bidPrice) = entry._2
     (entry._1.substring(0,18), s"dsp-bid:$bidPrice; dsp-win-notif:$winNotificationPrice")
   }
+
+  private def keySspBidResponse(line: String): (String, String) = {
+    val response = SspBidResponse.fromJson(line)
+    val bid = response.response.seatbid.head.bid.head
+    (bid.id, s"ssp-bid:${bid.price}, adid:${bid.adid}")
+  }
+
+  private def keyShowHandlerLog(line:String): (String, String) = {
+    val showHandlerLog = ShowHandlerLog.fromLog(line)
+    (showHandlerLog.iid, s"ssp-win:${showHandlerLog.cost}, slotId:${showHandlerLog.slotId}, adid:${showHandlerLog.advertId}")
+  }
+
 }
