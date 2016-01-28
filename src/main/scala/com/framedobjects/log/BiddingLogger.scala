@@ -144,8 +144,8 @@ object BiddingLogger {
 
   private def keyOpenRtbResponse(line: String): (String, (String, Double)) = {
     val json = OpenRtbResponseLogEntry.fromJson(line)
-    val price = json.response.seatbid(0).bid(0).price
-    (json.response.id.substring(0, 20), (json.tpid.toString(), price))
+    val price = json.response.seatbid.get(0).bid(0).price
+    (json.response.id.get.substring(0, 20), (json.tpid.toString(), price))
   }
 
   private def keyAdscaleNotification(line: String): (String, String) = {

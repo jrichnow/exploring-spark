@@ -13,21 +13,23 @@ import scala.util.matching.Regex
 object TransferFiles {
   
   val sourceRoot = "//data/adscale/dsp-log"
-  val date = "2016-01-06"
+  val date = "2016-01-27"
 
-  val destinationFolder = s"/users/jensr/Documents/DevNotes/investigations/adscale-1559/logs/$date/"
+  val destinationFolder = s"/users/jensr/Documents/DevNotes/investigations/adscale-1674/logs/"
 
   def main(args: Array[String]) {
-    val dhList = (1 to 8).toList.map(x => s"0$x")
-    for (dh <- dhList) {
+//    val dhList = (1 to 8).toList.map(x => s"0$x")
+//    for (dh <- dhList) {
 //      getGzLogFiles(dh, "dsp-adscale-bidresponse-", (0 to 7).toList)
 //      getLogFiles(dh, "dsp-adscale-bidresponse-3")
-      getLogFiles(dh, "dsp-adscale-notification-3")
-    }
+//      getLogFiles(dh, "dsp-adscale-notification-3")
+//    }
 
 //    getLogFiles("dsp-adscale-bidresponse-", (0 to 18).toList)
 //    getLogFiles("dsp-openrtb-bidrequest-", (0 to 17).toList)
-//    getLogFiles("dsp-openrtb-bidresponse-", (0 to 13).toList)
+
+//    getGzLogFiles("18", "dsp-openrtb-bidresponse-4", (101 to 1200).toList)
+    getGzLogFiles("18", "dsp-openrtb-notification-4", (101 to 107).toList)
   }
 
   private def getGzLogFiles(handler: String, fileRoot: String, fileParts: List[Int]) {

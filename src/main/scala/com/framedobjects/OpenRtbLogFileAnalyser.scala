@@ -71,7 +71,7 @@ object OpenRtbLogFileAnalyser {
   }
 
   private def convertResponseToText(entry: OpenRtbResponseLogEntry): String = {
-    s"${getUtcDateTime(entry.time)}, ${entry.time}, ${entry.response.id}, ${entry.response.seatbid(0).bid(0).id}, ${entry.response.seatbid(0).bid(0).price}"
+    s"${getUtcDateTime(entry.time)}, ${entry.time}, ${entry.response.id}, ${entry.response.seatbid.get(0).bid(0).id}, ${entry.response.seatbid.get(0).bid(0).price}"
   }
   
   private def convertRequestToText(entry: OpenRtbRequestLogEntry): String = {

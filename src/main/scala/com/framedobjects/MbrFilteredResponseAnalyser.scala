@@ -16,7 +16,7 @@ object MbrFilteredResponseAnalyser {
 //     auction22_RDD.foreach(println)
      
      val price025RDD = auction22_RDD.filter(_.contains("\"price\":1"))
-     val impressionIds025 = price025RDD.map(OpenRtbResponseLogEntry.fromJson(_)).map(_.response.id).map(_.substring(0, 18))
-     println(impressionIds025.toArray.mkString(","))
+//     val impressionIds025 = price025RDD.map(OpenRtbResponseLogEntry.fromJson(_)).map(_.response.id).map(_.substring(0, 18))
+//     println(impressionIds025.toArray.mkString(","))
   }
 }

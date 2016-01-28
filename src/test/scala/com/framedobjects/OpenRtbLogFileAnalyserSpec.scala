@@ -38,9 +38,9 @@ class OpenRtbLogFileAnalyserSpec extends FlatSpec with Matchers {
     response.tpid should be(48)
     response.responseTime should be(41)
     response.response.id should be("414311418114936699")
-    response.response.seatbid(0).bid(0).id should be("414311418114936699~1")
-    response.response.seatbid(0).bid(0).impid should be("1")
-    response.response.seatbid(0).bid(0).price should be(0.066549)
+    response.response.seatbid.get(0).bid(0).id should be("414311418114936699~1")
+    response.response.seatbid.get(0).bid(0).impid should be("1")
+    response.response.seatbid.get(0).bid(0).price should be(0.066549)
   }
 
   "An earlier time" should "be before a later time" in {
