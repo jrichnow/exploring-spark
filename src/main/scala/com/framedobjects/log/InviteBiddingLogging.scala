@@ -2,9 +2,9 @@ package com.framedobjects.log
 
 import java.io.{File, PrintWriter}
 
-import com.framedobjects.model.{OpenRtbNotificationLogEntry, OpenRtbResponseLogEntrySimple, OpenRtbResponseLogEntry, OpenRtbRequestLogEntry}
+import com.framedobjects.model.{OpenRtbNotificationLogEntry, OpenRtbRequestLogEntry, OpenRtbResponseLogEntry}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.{SparkContext, SparkConf}
+import org.apache.spark.{SparkConf, SparkContext}
 
 object InviteBiddingLogging {
 
@@ -12,43 +12,33 @@ object InviteBiddingLogging {
   val partnerString = "\"tpid\":38"
 
   def main(args: Array[String]) {
-    val investigationRootFolder = "/users/jensr/Documents/DevNotes/investigations/adscale-1674"
-    val bidRequestFileName = s"$investigationRootFolder/logs/$dealId.log.gz"
-    val bidresponseFileName = s"$investigationRootFolder/logs/dsp-openrtb-bidresponse-418--2016-01-27--*.log.gz"
-    val notificationFileName = s"$investigationRootFolder/logs/dsp-openrtb-notification-418--2016-01-27--*.log.gz"
-    val resultFileName = s"$investigationRootFolder/$dealId.csv"
-
     val sparkConfig = new SparkConf().setMaster("local").setAppName("Log Files Investigation")
     val sparkContext = new SparkContext(sparkConfig)
-
-    // Bid Request
-    val rawBidRequestRDD = sparkContext.textFile(bidRequestFileName)
-    println(s"${rawBidRequestRDD.count()} requests")
-
-    val filterByDealRequestRDD = rawBidRequestRDD.map(mapDealInRequestByIid(_))
-    filterByDealRequestRDD.take(10).foreach(println)
-
-    // Bid Response
-    val filteredRawBidResponseRDD = sparkContext.textFile(bidresponseFileName).filter(_.contains(partnerString))
-        .map(mapResponseByRequestId(_))
-    filteredRawBidResponseRDD.take(10).foreach(println)
-
-    // Join the request and response by requestId
-    val joinedRDD = filterByDealRequestRDD.join(filteredRawBidResponseRDD)
-    joinedRDD.top(10).foreach(println)
-    println(s"${joinedRDD.count()} joined requests and responses")
-
-    // Notifications.
-    val filteredNotificationRDD = sparkContext.textFile(notificationFileName).filter(_.contains(partnerString)).map(mapNotificationByRequestId(_))
-    filteredNotificationRDD.take(10).foreach(println)
-
-    val allJoinedRDD = joinedRDD.leftOuterJoin(filteredNotificationRDD)
-    allJoinedRDD.take(50).foreach(println)
-
-    println(s"${allJoinedRDD.count()} joined requests and responses")
-
-    saveResult(allJoinedRDD, resultFileName)
+    val investigationRootFolder = "/users/jensr/Documents/DevNotes/investigations/adscale-1674"
+    val investigationOutFolder = "/users/jensr/Documents/DevNotes/investigations/adscale-1674"
+    val deal: String = s"$dealId"
+    runJob(sparkContext, investigationRootFolder, investigationOutFolder, deal)
   }
+
+
+  def runJob(sparkContext: SparkContext, investigationRootFolder: String, investigationOutFolder: String, deal: String): Unit = {
+    val bidRequestFileName = s"$investigationRootFolder/$deal.log.gz"
+    val bidresponseFileName = s"$investigationRootFolder/dsp-openrtb-bidresponse-418--2016-01-27--*.log.gz"
+    val notificationFileName = s"$investigationRootFolder/dsp-openrtb-notification-418--2016-01-27--*.log.gz"
+    val resultFileName = s"$investigationOutFolder/$deal.csv"
+
+    val rawBidRequestRDD = sparkContext.textFile(bidRequestFileName)
+    val filterByDealRequestRDD = rawBidRequestRDD.map(mapDealInRequestByIid(_))
+    val filteredRawBidResponseRDD = sparkContext.textFile(bidresponseFileName).filter(_.contains(partnerString)).map(mapResponseByRequestId(_))
+    val joinedRDD = filterByDealRequestRDD.join(filteredRawBidResponseRDD)
+    val filteredNotificationRDD = sparkContext.textFile(notificationFileName).filter(_.contains(partnerString)).map(mapNotificationByRequestId(_))
+    val allJoinedRDD = joinedRDD.leftOuterJoin(filteredNotificationRDD)
+    val csv = allJoinedRDD.map { case (requestId, ((request, response), notification)) =>
+      s"$requestId,${requestId.substring(0, 18)},$request,$response,${notification.getOrElse(",,")}"
+    }
+    csv.repartition(1).saveAsTextFile(resultFileName)
+  }
+
 
   private def mapDealInRequestByIid(line: String): (String, String) = {
     val entry = OpenRtbRequestLogEntry.fromJson(line)
