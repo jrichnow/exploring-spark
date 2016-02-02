@@ -1,3 +1,14 @@
 .idea
+.cache
+.cache-main
+.cache-tests
+.classpath
+.project
+.settings
+*.iml
+bin/
+derby.log
+metastore_db/
+out/
 target
 project

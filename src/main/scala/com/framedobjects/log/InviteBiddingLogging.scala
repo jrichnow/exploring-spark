@@ -22,9 +22,9 @@ object InviteBiddingLogging {
 
 
   def runJob(sparkContext: SparkContext, investigationRootFolder: String, investigationOutFolder: String, deal: String): Unit = {
-    val bidRequestFileName = s"$investigationRootFolder/$deal.log.gz"
-    val bidresponseFileName = s"$investigationRootFolder/dsp-openrtb-bidresponse-418--2016-01-27--*.log.gz"
-    val notificationFileName = s"$investigationRootFolder/dsp-openrtb-notification-418--2016-01-27--*.log.gz"
+    val bidRequestFileName = s"$investigationRootFolder/logs/$deal.log.gz"
+    val bidresponseFileName = s"$investigationRootFolder/logs/dsp-openrtb-bidresponse-418--2016-01-27--0.log.gz"
+    val notificationFileName = s"$investigationRootFolder/logs/dsp-openrtb-notification-418--2016-01-27--0.log.gz"
     val resultFileName = s"$investigationOutFolder/$deal.csv"
 
     val rawBidRequestRDD = sparkContext.textFile(bidRequestFileName)
@@ -33,10 +33,11 @@ object InviteBiddingLogging {
     val joinedRDD = filterByDealRequestRDD.join(filteredRawBidResponseRDD)
     val filteredNotificationRDD = sparkContext.textFile(notificationFileName).filter(_.contains(partnerString)).map(mapNotificationByRequestId(_))
     val allJoinedRDD = joinedRDD.leftOuterJoin(filteredNotificationRDD)
-    val csv = allJoinedRDD.map { case (requestId, ((request, response), notification)) =>
-      s"$requestId,${requestId.substring(0, 18)},$request,$response,${notification.getOrElse(",,")}"
-    }
-    csv.repartition(1).saveAsTextFile(resultFileName)
+//    val csv = allJoinedRDD.map { case (requestId, ((request, response), notification)) =>
+//      s"$requestId,${requestId.substring(0, 18)},$request,$response,${notification.getOrElse(",,")}"
+//    }
+//    csv.repartition(1).saveAsTextFile(resultFileName)
+    saveResult(allJoinedRDD, s"$investigationRootFolder/$dealId.csv")
   }
 
 
